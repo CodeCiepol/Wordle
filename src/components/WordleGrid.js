@@ -2,8 +2,9 @@ import Card from "../UI/Card";
 
 const WordleGrid = (props) => {
     
-    const letterList = props.letters.padEnd(5).split("").map((letter) => (
-      <Card className="square">
+    const letterList = props.letters.padEnd(props.numbersOfLetters).split("").map((letter) => (
+      <Card className="square" key={Math.random()}>
+
         <div className="letter">{letter}</div>
       </Card>
     ));
