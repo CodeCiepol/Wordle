@@ -1,13 +1,9 @@
-import Card from "../UI/Card";
+import WordleRow from './WordleRow'
 
 const WordleGrid = (props) => {
-    
-    const letterList = props.letters.padEnd(props.numbersOfLetters).split("").map((letter) => (
-      <Card className="square" key={Math.random()}>
-
-        <div className="letter">{letter}</div>
-      </Card>
-    ));
-  return <div className="row">{letterList}</div>;
-};
-export default WordleGrid;
+  const LettersGrid = props.wordsHodler.map((word) => (
+    <WordleRow letters={word} maxNumbersOfLetters={props.maxNumbersOfLetters} key={Math.random()} />
+  ))
+  return <div>{LettersGrid}</div>
+}
+export default WordleGrid
