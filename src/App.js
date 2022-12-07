@@ -47,7 +47,7 @@ export default function App() {
           wordsHodler={wordsHodler}
         />
         <InputRow letters={newWord} maxNumbersOfLetters={maxNumbersOfLetters}></InputRow>
-        <div>siema</div>
+        <div>siema2</div>
         {/* <WordleGrid
           maxNumbersOfLetters={0}
           maxNumbersOfRows={maxNumbersOfRows}
