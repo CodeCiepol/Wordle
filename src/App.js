@@ -3,22 +3,47 @@ import './App.css'
 import InputRow from './components/InputRow'
 import WordleGrid from './components/WordleGrid'
 import dummyWords from './components/dummyWords'
+import Card from './UI/Card'
 
 export default function App() {
   const [newWord, setNewWord] = useState('')
   const [numberOfAttemps, setNumberOfAttemps] = useState(0)
   const maxNumbersOfRows = 5
   const [wordsHodler, setWordsHodler] = useState([])
+  const [checkLetter, setCheckLetter] = useState([{}])
   const [randomWord, setRandomWord] = useState(dummyWords[Math.floor(Math.random() * dummyWords.length)])
   const maxNumbersOfLetters = randomWord.length
 
+  const stateHandler = useCallback(
+    (letter, i) => {
+      if (randomWord[i] === letter) return 2
+      if (randomWord.includes(letter)) return 1
+      return 0
+    },
+    [randomWord]
+  )
+
+  const checkLetterHandler = useCallback(() => {
+    let state = ''
+    const checkLetterTemp = []
+    newWord.split('').forEach((letter, i) => {
+      for (const taskKey in checkLetter) {
+        if (!(letter === checkLetter[taskKey].letter)) {
+          state = stateHandler(letter, i)
+          checkLetterTemp.push({ letter, state })
+        }
+      }
+    })
+    setCheckLetter(checkLetterTemp)
+  }, [newWord, stateHandler,checkLetter])
+
   const enterIsClicked = useCallback(() => {
-    console.log({ wordsHodler, newWord, numberOfAttemps })
     setNumberOfAttemps((prev) => prev + 1)
     setWordsHodler((prev) => [...prev, newWord])
+    checkLetterHandler()
     setNewWord('')
-    // setRandomWord(dummyWords[Math.floor(Math.random() * dummyWords.length)])
-  }, [newWord, numberOfAttemps, wordsHodler])
+  }, [newWord, checkLetterHandler])
+  console.log(checkLetter)
 
   const backspaceIsClicked = () => {
     setNewWord((prevWord) => prevWord.slice(0, -1))
@@ -30,12 +55,10 @@ export default function App() {
     },
     [newWord.length, numberOfAttemps, maxNumbersOfLetters]
   )
-  // console.log('dummyWords', dummyWords.length, dummyWords[dummyWords.length - 1])
-  console.log('randomWord', randomWord)
+
   const detectKeyDown = useCallback(
     (event) => {
       if (enterIsAvaible(event)) enterIsClicked()
-      console.log(enterIsAvaible(event))
       if (event.key === 'Backspace' && newWord) backspaceIsClicked()
       if (event.key === 'Delete') backspaceIsClicked()
       if (event.keyCode < 65 || event.keyCode > 90) return
@@ -64,7 +87,7 @@ export default function App() {
           wordsHodler={wordsHodler}
         />
         <InputRow letters={newWord} maxNumbersOfLetters={maxNumbersOfLetters}></InputRow>
-        <div>zgadnij jakie to słowo, masz na to {maxNumbersOfRows} prób!</div>
+        <Card>zgadnij jakie to słowo, masz na to {maxNumbersOfRows} prób!</Card>
         <button onClick={newWordHandler}>Nowe słowo</button>
         {/* <WordleGrid
           maxNumbersOfLetters={0}

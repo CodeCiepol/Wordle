@@ -2,7 +2,7 @@ const dummyWords = [
   'test',
   'siema',
   'spalony',
-  'pijany',
+  'alkohol',
   'nigdy',
   'klaps',
   'strajk',
