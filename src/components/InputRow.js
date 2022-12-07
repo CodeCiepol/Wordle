@@ -6,7 +6,7 @@ const InputRow = (props) => {
     .split('')
     .map((letter) => (
       <Card className="square" key={Math.random()}>
-        <div className="letter">{letter}</div>
+        <div className="letter">{letter.toUpperCase()}</div>
       </Card>
     ))
   return <div className="row">{letterList}</div>
