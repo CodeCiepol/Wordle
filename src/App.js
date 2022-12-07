@@ -12,13 +12,14 @@ export default function App() {
   const [wordsHodler, setWordsHodler] = useState([])
   const [randomWord, setRandomWord] = useState(dummyWords[Math.floor(Math.random() * dummyWords.length)])
 
-  const enterIsClicked = () => {
+  const enterIsClicked = useCallback(() => {
+    console.log({ wordsHodler, newWord, numberOfAttemps })
     setNumberOfAttemps((prev) => prev + 1)
     setWordsHodler((prev) => [...prev, newWord])
     setNewWord('')
     setRandomWord(dummyWords[Math.floor(Math.random() * dummyWords.length)])
-  }
 
+  },[newWord,numberOfAttemps,wordsHodler])
   const backspaceIsClicked = () => {
     setNewWord((prevWord) => prevWord.slice(0, -1))
   }
@@ -27,14 +28,14 @@ export default function App() {
   console.log('randomWord', randomWord)
   const detectKeyDown = useCallback(
     (event) => {
-      if (event.key === 'Enter') enterIsClicked()
+      if (event.key === 'Enter'&&newWord.length===maxNumbersOfLetters) enterIsClicked()
       if (event.key === 'Backspace' && newWord) backspaceIsClicked()
       if (event.key === 'Delete') backspaceIsClicked()
       if (event.keyCode < 65 || event.keyCode > 90) return
       if (newWord.length > maxNumbersOfLetters - 1) return
       setNewWord((prevWord) => prevWord + event.key.toLowerCase())
     },
-    [newWord]
+    [newWord,enterIsClicked]
   )
 
   useEffect(() => {
@@ -51,6 +52,7 @@ export default function App() {
           wordsHodler={wordsHodler}
         />
         <InputRow letters={newWord} maxNumbersOfLetters={maxNumbersOfLetters}></InputRow>
+        <div>siema2</div>
         {/* <WordleGrid
           maxNumbersOfLetters={0}
           maxNumbersOfRows={maxNumbersOfRows}
