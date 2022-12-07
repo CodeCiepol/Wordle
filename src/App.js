@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import './App.css'
 import InputRow from './components/InputRow'
 import WordleGrid from './components/WordleGrid'
+import dummyWords from './components/dummyWords'
 
 export default function App() {
   const [newWord, setNewWord] = useState('')
@@ -9,20 +10,23 @@ export default function App() {
   const maxNumbersOfLetters = 8
   const maxNumbersOfRows = 5
   const [wordsHodler, setWordsHodler] = useState([])
+  const [randomWord, setRandomWord] = useState(dummyWords[Math.floor(Math.random() * dummyWords.length)])
 
   const enterIsClicked = () => {
-    console.log({ wordsHodler, newWord, numberOfAttemps })
     setNumberOfAttemps((prev) => prev + 1)
     setWordsHodler((prev) => [...prev, newWord])
     setNewWord('')
+    setRandomWord(dummyWords[Math.floor(Math.random() * dummyWords.length)])
   }
+
   const backspaceIsClicked = () => {
     setNewWord((prevWord) => prevWord.slice(0, -1))
   }
-
+  
+  console.log('dummyWords', dummyWords.length, dummyWords[dummyWords.length - 1])
+  console.log('randomWord', randomWord)
   const detectKeyDown = useCallback(
     (event) => {
-      console.log(event)
       if (event.key === 'Enter') enterIsClicked()
       if (event.key === 'Backspace' && newWord) backspaceIsClicked()
       if (event.key === 'Delete') backspaceIsClicked()
