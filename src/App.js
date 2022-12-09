@@ -16,6 +16,7 @@ export default function App() {
 
   const replaceCharString = (string, index, char) => {
     if (index >= string.length) return string
+    console.log(string.substring(0, index) + char + string.substring(index + char.length))
     return string.substring(0, index) + char + string.substring(index + char.length)
   }
 
@@ -34,16 +35,20 @@ export default function App() {
     return stringTemp
   }
 
-  const stateHandler = useCallback((letter, i, randomWordTemp) => {
+  const stateHandlerBingo = useCallback((letter, i, randomWordTemp) => {
     if (randomWordTemp[i] === letter) {
       return { state: 'bingo', randomWordTemp: replaceCharString(randomWordTemp, i, '0') }
     }
+    return { state: 'none', randomWordTemp }
+  }, [])
 
+
+  const stateHandlerInclude = useCallback((state,letter, i, randomWordTemp) => {
     if (randomWordTemp.includes(letter)) {
       console.log('litera', letter, 'includes w stateHandlerze')
       return { state: 'include', randomWordTemp: findAndReplace(randomWordTemp, letter, '0') }
     }
-    return { state: 'none', randomWordTemp }
+    return { state:state[i], randomWordTemp }
   }, [])
 
   // const stateHandler = (letter, i, randomWordTemp) => {
@@ -65,26 +70,29 @@ export default function App() {
     let randomWordTemp = randomWord
     console.log(randomWordTemp.slice(1))
     let obj = {}
+
     newWordTemp.forEach((letter, i) => {
-      obj = stateHandler(letter, i, randomWordTemp)
-      // console.log("obj",obj)
+      obj = stateHandlerBingo(letter, i, randomWordTemp)
       randomWordTemp = obj.randomWordTemp
       checkLetterTemp[i] = obj.state
-      // checkLetterTemp.push({ letter, state })
-
-      // for (const taskKey in checkLetter) {
-      //   if (!(letter === checkLetter[taskKey].letter)) {
-      //     state = stateHandler(letter, i)
-      //     checkLetterTemp.push({ letter, state })
-      //   }
-      // }
     })
-    console.log('checkLetterTemp', checkLetterTemp)
+      console.log("BINGO randomWordTemp:",randomWordTemp,"checkLetterTemp",checkLetterTemp)
+
+
+    newWordTemp.forEach((letter, i) => {
+      obj = stateHandlerInclude(checkLetterTemp,letter, i, randomWordTemp)
+      console.log("objINCLUDE",obj)
+      randomWordTemp = obj.randomWordTemp
+      checkLetterTemp[i] = obj.state
+    })
+    console.log("INCLUDE randomWordTemp:",randomWordTemp,"checkLetterTemp",checkLetterTemp)
+
+
     let checkLetterArrayTemp = checkLetterArray
     checkLetterArrayTemp.push(checkLetterTemp)
     console.log('checckLetterArrayTemp', checkLetterArrayTemp)
     setCheckLetterArray(checkLetterArrayTemp)
-  }, [newWord, stateHandler, randomWord,checkLetterArray])
+  }, [newWord, stateHandlerInclude, stateHandlerBingo, randomWord, checkLetterArray])
 
   const enterIsClicked = useCallback(() => {
     setNumberOfAttemps((prev) => prev + 1)
@@ -136,7 +144,7 @@ export default function App() {
           checkLetterArray={checkLetterArray}
         />
         <InputRow letters={newWord} maxNumbersOfLetters={maxNumbersOfLetters}></InputRow>
-        <Card className="whiteBackground">zgadnij jakie to słowo, masz na to {maxNumbersOfRows} prób!</Card>
+        <Card className="whiteBackground">zgadnij jakie to słowo, masz na to {maxNumbersOfRows-numberOfAttemps} prób!</Card>
         <button onClick={newWordHandler}>Nowe słowo</button>
         {/* <WordleGrid
           maxNumbersOfLetters={0}
