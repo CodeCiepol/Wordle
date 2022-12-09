@@ -84,7 +84,7 @@ export default function App() {
     checkLetterArrayTemp.push(checkLetterTemp)
     console.log('checckLetterArrayTemp', checkLetterArrayTemp)
     setCheckLetterArray(checkLetterArrayTemp)
-  }, [newWord, numberOfAttemps, stateHandler, randomWord,checkLetterArray])
+  }, [newWord, stateHandler, randomWord,checkLetterArray])
 
   const enterIsClicked = useCallback(() => {
     setNumberOfAttemps((prev) => prev + 1)
@@ -122,6 +122,8 @@ export default function App() {
   const newWordHandler = () => {
     setRandomWord(dummyWords[Math.floor(Math.random() * dummyWords.length)])
     setWordsHodler([])
+    setCheckLetterArray([])
+    setNumberOfAttemps(0)
   }
 
   return (
