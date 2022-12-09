@@ -14,28 +14,54 @@ export default function App() {
   const [randomWord, setRandomWord] = useState(dummyWords[Math.floor(Math.random() * dummyWords.length)])
   const maxNumbersOfLetters = randomWord.length
 
-  const stateHandler = useCallback(
-    (letter, i) => {
-      if (randomWord[i] === letter) return 2
-      if (randomWord.includes(letter)) return 1
-      return 0
-    },
-    [randomWord]
-  )
+  const stateHandler = (letter, i, randomWordTemp) => {
+    if (randomWordTemp[i] === letter) {
+      console.log("randomWordTemp in stateHandlerze slice", randomWordTemp.slice(i))//tępa pało slice działa na arrey, ty masz string
+      console.log("randomWordTemp in stateHandlerze",randomWordTemp)
+      return {state:'bingo', randomWordTemp: randomWordTemp }
+    }
+    
+    if (randomWordTemp.includes(letter)) return { state: 'include', randomWordTemp: randomWordTemp }
+
+    return { state: 'none', randomWordTemp }
+  }
+
+  // const stateHandler = (letter, i, randomWordTemp) => {
+  //   if (randomWordTemp[i] === letter) {
+  //     // randomWordTemp.slice(i)
+  //     return {state:"bingo",tekst:"dupa"}
+  //   }
+    
+  //   if (randomWordTemp.includes(letter)) return {state:"bingo",tekst:"dupa"}
+
+  //   return {state:"bingo",tekst:"dupa"}
+  // }
+  
+
+  console.log('randomWord', randomWord)
 
   const checkLetterHandler = useCallback(() => {
     let state = ''
     const checkLetterTemp = []
-    newWord.split('').forEach((letter, i) => {
-      for (const taskKey in checkLetter) {
-        if (!(letter === checkLetter[taskKey].letter)) {
-          state = stateHandler(letter, i)
-          checkLetterTemp.push({ letter, state })
-        }
-      }
+    let newWordTemp = newWord
+    let randomWordTemp = randomWord
+    let obj={}
+    newWordTemp.split('').forEach((letter, i) => {
+      obj = stateHandler(letter, i, randomWordTemp)
+      console.log("obj",obj)
+      randomWordTemp=obj.randomWordTemp
+      console.log(randomWordTemp) 
+      // checkLetterTemp.push({ letter, state })
+
+      // for (const taskKey in checkLetter) {
+      //   if (!(letter === checkLetter[taskKey].letter)) {
+      //     state = stateHandler(letter, i)
+      //     checkLetterTemp.push({ letter, state })
+      //   }
+      // }
     })
     setCheckLetter(checkLetterTemp)
-  }, [newWord, stateHandler,checkLetter])
+  }, [newWord, stateHandler, checkLetter, randomWord])
 
   const enterIsClicked = useCallback(() => {
     setNumberOfAttemps((prev) => prev + 1)
@@ -49,16 +75,13 @@ export default function App() {
     setNewWord((prevWord) => prevWord.slice(0, -1))
   }
 
-  const enterIsAvaible = useCallback(
-    (event) => {
-      return event.key === 'Enter' && newWord.length === maxNumbersOfLetters && numberOfAttemps < maxNumbersOfRows
-    },
-    [newWord.length, numberOfAttemps, maxNumbersOfLetters]
-  )
+  const enterIsAvaible = useCallback(() => {
+    return newWord.length === maxNumbersOfLetters && numberOfAttemps < maxNumbersOfRows
+  }, [newWord.length, numberOfAttemps, maxNumbersOfLetters])
 
   const detectKeyDown = useCallback(
     (event) => {
-      if (enterIsAvaible(event)) enterIsClicked()
+      if (event.key === 'Enter' && enterIsAvaible()) enterIsClicked()
       if (event.key === 'Backspace' && newWord) backspaceIsClicked()
       if (event.key === 'Delete') backspaceIsClicked()
       if (event.keyCode < 65 || event.keyCode > 90) return
