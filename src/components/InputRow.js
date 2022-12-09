@@ -9,6 +9,6 @@ const InputRow = (props) => {
         <div className="letter">{letter.toUpperCase()}</div>
       </Card>
     ))
-  return <div className="row">{letterList}</div>
+  return <div className="row" contenteditable="true">{letterList}</div>
 }
 export default InputRow
