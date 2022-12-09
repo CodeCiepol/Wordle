@@ -1,8 +1,9 @@
 import WordleRow from './WordleRow'
 
 const WordleGrid = (props) => {
-  const LettersGrid = props.wordsHodler.map((word) => (
-    <WordleRow letters={word} maxNumbersOfLetters={props.maxNumbersOfLetters} key={Math.random()} />
+  console.log(props.checkLetterArray[0])
+  const LettersGrid = props.wordsHodler.map((word,i) => (
+    <WordleRow letters={word} maxNumbersOfLetters={props.maxNumbersOfLetters} key={Math.random()} checkLetterArray={props.checkLetterArray[i]}/>
   ))
   return <div>{LettersGrid}</div>
 }

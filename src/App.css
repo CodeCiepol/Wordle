@@ -14,7 +14,7 @@
   height: 4rem;
   margin-right: 0.2rem;
   margin-top: 0.2rem;
-  background-color: black;
+  background-color: rgb(255, 255, 255);
 }
 
 .letter{
@@ -24,10 +24,25 @@
   left: 50%;
   transform: translate(-50%,-50%);
 }
+.square.bingo{
+  background-color: rgb(93, 230, 8);
+}
+
+.square.include{
+  background-color: rgb(255, 242, 0);
+}
+
+.square.none{
+  background-color: rgb(100, 100, 100);
+}
 
 .Game{
   position: absolute;
   bottom:50%;
   left:50%;
   transform: translate(-50%,50%);
+}
+
+.whiteBackground{
+  background-color: white;
 }
