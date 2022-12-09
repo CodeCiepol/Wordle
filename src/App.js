@@ -146,6 +146,9 @@ export default function App() {
         <InputRow letters={newWord} maxNumbersOfLetters={maxNumbersOfLetters}></InputRow>
         <Card className="whiteBackground">zgadnij jakie to słowo, masz na to {maxNumbersOfRows-numberOfAttemps} prób!</Card>
         <button onClick={newWordHandler}>Nowe słowo</button>
+        <div>
+        <input value={"klawiatura telefonu"}></input>
+        </div>
         {/* <WordleGrid
           maxNumbersOfLetters={0}
           maxNumbersOfRows={maxNumbersOfRows}
