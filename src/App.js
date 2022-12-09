@@ -7,50 +7,69 @@ import Card from './UI/Card'
 
 export default function App() {
   const [newWord, setNewWord] = useState('')
-  const [numberOfAttemps, setNumberOfAttemps] = useState(0)
   const maxNumbersOfRows = 5
   const [wordsHodler, setWordsHodler] = useState([])
-  const [checkLetter, setCheckLetter] = useState([{}])
+  const [numberOfAttemps, setNumberOfAttemps] = useState(0)
+  const [checkLetterArray, setCheckLetterArray] = useState([])
   const [randomWord, setRandomWord] = useState(dummyWords[Math.floor(Math.random() * dummyWords.length)])
   const maxNumbersOfLetters = randomWord.length
 
-  const stateHandler = (letter, i, randomWordTemp) => {
-    if (randomWordTemp[i] === letter) {
-      console.log("randomWordTemp in stateHandlerze slice", randomWordTemp.slice(i))//tępa pało slice działa na arrey, ty masz string
-      console.log("randomWordTemp in stateHandlerze",randomWordTemp)
-      return {state:'bingo', randomWordTemp: randomWordTemp }
-    }
-    
-    if (randomWordTemp.includes(letter)) return { state: 'include', randomWordTemp: randomWordTemp }
-
-    return { state: 'none', randomWordTemp }
+  const replaceCharString = (string, index, char) => {
+    if (index >= string.length) return string
+    return string.substring(0, index) + char + string.substring(index + char.length)
   }
+
+  const findAndReplace = (string, charToFind, CharToReplace) => {
+    let stringTemp = string.split('')
+    string.split('').every((leter, j) => {
+      console.log('index', j, 'includes w findAndReplace', string, charToFind, CharToReplace)
+      if (leter === charToFind) {
+        stringTemp[j] = CharToReplace
+        stringTemp = stringTemp.join('')
+        console.log('znaleziono i podmieniono na:', stringTemp)
+        return false
+      }
+      return true
+    })
+    return stringTemp
+  }
+
+  const stateHandler = useCallback((letter, i, randomWordTemp) => {
+    if (randomWordTemp[i] === letter) {
+      return { state: 'bingo', randomWordTemp: replaceCharString(randomWordTemp, i, '0') }
+    }
+
+    if (randomWordTemp.includes(letter)) {
+      console.log('litera', letter, 'includes w stateHandlerze')
+      return { state: 'include', randomWordTemp: findAndReplace(randomWordTemp, letter, '0') }
+    }
+    return { state: 'none', randomWordTemp }
+  }, [])
 
   // const stateHandler = (letter, i, randomWordTemp) => {
   //   if (randomWordTemp[i] === letter) {
   //     // randomWordTemp.slice(i)
   //     return {state:"bingo",tekst:"dupa"}
   //   }
-    
+
   //   if (randomWordTemp.includes(letter)) return {state:"bingo",tekst:"dupa"}
 
   //   return {state:"bingo",tekst:"dupa"}
   // }
-  
 
   console.log('randomWord', randomWord)
 
   const checkLetterHandler = useCallback(() => {
-    let state = ''
     const checkLetterTemp = []
-    let newWordTemp = newWord
+    let newWordTemp = newWord.split('')
     let randomWordTemp = randomWord
-    let obj={}
-    newWordTemp.split('').forEach((letter, i) => {
+    console.log(randomWordTemp.slice(1))
+    let obj = {}
+    newWordTemp.forEach((letter, i) => {
       obj = stateHandler(letter, i, randomWordTemp)
-      console.log("obj",obj)
-      randomWordTemp=obj.randomWordTemp
-      console.log(randomWordTemp) 
+      // console.log("obj",obj)
+      randomWordTemp = obj.randomWordTemp
+      checkLetterTemp[i] = obj.state
       // checkLetterTemp.push({ letter, state })
 
       // for (const taskKey in checkLetter) {
@@ -60,16 +79,20 @@ export default function App() {
       //   }
       // }
     })
-    setCheckLetter(checkLetterTemp)
-  }, [newWord, stateHandler, checkLetter, randomWord])
+    console.log('checkLetterTemp', checkLetterTemp)
+    let checkLetterArrayTemp = checkLetterArray
+    checkLetterArrayTemp.push(checkLetterTemp)
+    console.log('checckLetterArrayTemp', checkLetterArrayTemp)
+    setCheckLetterArray(checkLetterArrayTemp)
+  }, [newWord, numberOfAttemps, stateHandler, randomWord,checkLetterArray])
 
   const enterIsClicked = useCallback(() => {
     setNumberOfAttemps((prev) => prev + 1)
     setWordsHodler((prev) => [...prev, newWord])
     checkLetterHandler()
+    console.log('checkLetterArray', checkLetterArray)
     setNewWord('')
-  }, [newWord, checkLetterHandler])
-  console.log(checkLetter)
+  }, [newWord, checkLetterArray, checkLetterHandler])
 
   const backspaceIsClicked = () => {
     setNewWord((prevWord) => prevWord.slice(0, -1))
@@ -108,9 +131,10 @@ export default function App() {
           maxNumbersOfLetters={maxNumbersOfLetters}
           maxNumbersOfRows={maxNumbersOfRows}
           wordsHodler={wordsHodler}
+          checkLetterArray={checkLetterArray}
         />
         <InputRow letters={newWord} maxNumbersOfLetters={maxNumbersOfLetters}></InputRow>
-        <Card>zgadnij jakie to słowo, masz na to {maxNumbersOfRows} prób!</Card>
+        <Card className="whiteBackground">zgadnij jakie to słowo, masz na to {maxNumbersOfRows} prób!</Card>
         <button onClick={newWordHandler}>Nowe słowo</button>
         {/* <WordleGrid
           maxNumbersOfLetters={0}
