@@ -3,6 +3,7 @@ import './App.css'
 import InputRow from './components/InputRow'
 import WordleGrid from './components/WordleGrid'
 import dummyWords from './components/dummyWords'
+import KeyboardGrid from './components/KeyboardGrid'
 import Card from './UI/Card'
 
 export default function App() {
@@ -147,8 +148,9 @@ export default function App() {
         <Card className="whiteBackground">zgadnij jakie to słowo, masz na to {maxNumbersOfRows-numberOfAttemps} prób!</Card>
         <button onClick={newWordHandler}>Nowe słowo</button>
         <div>
-        <input value={"klawiatura telefonu"}></input>
+        {/* <input value={"klawiatura telefonu"}></input> */}
         </div>
+        <KeyboardGrid wordsHodler={['qwertyuiop','asdfghjkl','zxcvbnm']}></KeyboardGrid>
         {/* <WordleGrid
           maxNumbersOfLetters={0}
           maxNumbersOfRows={maxNumbersOfRows}
