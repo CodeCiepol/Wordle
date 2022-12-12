@@ -1,20 +1,18 @@
 import Card from '../UI/Card'
 
-function clickHandler(letter) {
-  console.log(letter)
-}
 
 const KeyboardGrid = (props) => {
   const singleKeyboardRow = (word) =>
     word.split('').map((letter, j) => (
-      <div onClick={()=>clickHandler(letter)}>
-        <Card className="square keyboard">
+      // {const obj={key: letter, keyCode=70}}
+      <div key={Math.random()} onClick={()=>props.clickHandler({key: letter, keyCode: 70})}>
+        <Card className="square keyboard" >
           <div className={`letter keyboard`}>{letter.toUpperCase()}</div>
         </Card>
       </div>
     ))
 
-  const LettersGrid = props.wordsHodler.map((word, i) => <div className="row">{singleKeyboardRow(word)}</div>)
+  const LettersGrid = props.wordsHodler.map((word, i) => <div key={Math.random()} className="row">{singleKeyboardRow(word) }</div>)
 
   return <div style={{ marginTop: 10 }}>{LettersGrid}</div>
 }
