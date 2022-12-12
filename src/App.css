@@ -16,6 +16,14 @@
   margin-top: 0.2rem;
   background-color: rgb(255, 255, 255);
 }
+.square.keyboard{
+  position: relative;
+  width: 2rem;
+  height: 2rem;
+  margin-right: 0.1rem;
+  margin-top: 0.1rem;
+  background-color: rgb(139, 138, 138);
+}
 
 .letter{
   font-size: 200%;
@@ -23,6 +31,10 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%,-50%);
+}
+.letter.keyboard{
+  font-size: 100%;
+  position: absolute;
 }
 .square.bingo{
   background-color: rgb(93, 230, 8);
@@ -45,4 +57,5 @@
 
 .whiteBackground{
   background-color: white;
+  margin-top: 1rem;
 }
