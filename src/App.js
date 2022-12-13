@@ -43,13 +43,12 @@ export default function App() {
     return { state: 'none', randomWordTemp }
   }, [])
 
-
-  const stateHandlerInclude = useCallback((state,letter, i, randomWordTemp) => {
+  const stateHandlerInclude = useCallback((state, letter, i, randomWordTemp) => {
     if (randomWordTemp.includes(letter)) {
       console.log('litera', letter, 'includes w stateHandlerze')
       return { state: 'include', randomWordTemp: findAndReplace(randomWordTemp, letter, '0') }
     }
-    return { state:state[i], randomWordTemp }
+    return { state: state[i], randomWordTemp }
   }, [])
 
   // const stateHandler = (letter, i, randomWordTemp) => {
@@ -77,17 +76,15 @@ export default function App() {
       randomWordTemp = obj.randomWordTemp
       checkLetterTemp[i] = obj.state
     })
-      console.log("BINGO randomWordTemp:",randomWordTemp,"checkLetterTemp",checkLetterTemp)
-
+    console.log('BINGO randomWordTemp:', randomWordTemp, 'checkLetterTemp', checkLetterTemp)
 
     newWordTemp.forEach((letter, i) => {
-      obj = stateHandlerInclude(checkLetterTemp,letter, i, randomWordTemp)
-      console.log("objINCLUDE",obj)
+      obj = stateHandlerInclude(checkLetterTemp, letter, i, randomWordTemp)
+      console.log('objINCLUDE', obj)
       randomWordTemp = obj.randomWordTemp
       checkLetterTemp[i] = obj.state
     })
-    console.log("INCLUDE randomWordTemp:",randomWordTemp,"checkLetterTemp",checkLetterTemp)
-
+    console.log('INCLUDE randomWordTemp:', randomWordTemp, 'checkLetterTemp', checkLetterTemp)
 
     let checkLetterArrayTemp = checkLetterArray
     checkLetterArrayTemp.push(checkLetterTemp)
@@ -145,12 +142,28 @@ export default function App() {
           checkLetterArray={checkLetterArray}
         />
         <InputRow letters={newWord} maxNumbersOfLetters={maxNumbersOfLetters}></InputRow>
-        <Card className="whiteBackground">zgadnij jakie to słowo, masz na to {maxNumbersOfRows-numberOfAttemps} prób!</Card>
+        <Card className="whiteBackground">
+          zgadnij jakie to słowo, masz na to {maxNumbersOfRows - numberOfAttemps} prób!
+        </Card>
         <button onClick={newWordHandler}>Nowe słowo</button>
-        <div>
-        {/* <input value={"klawiatura telefonu"}></input> */}
-        </div>
-        <KeyboardGrid wordsHodler={['qwertyuiop','asdfghjkl','zxcvbnm']}></KeyboardGrid>
+        <button
+          style={{ marginLeft: 10, marginTop: 10 }}
+          onClick={() => {
+            detectKeyDown({ key: 'Backspace', keyCode: '1' })
+          }}
+        >
+          Backspace
+        </button>
+        <button
+          style={{ marginLeft: 10, marginTop: 10 }}
+          onClick={() => {
+            detectKeyDown({ key: 'Enter', keyCode: '1' })
+          }}
+        >
+          Enter
+        </button>
+        <div>{/* <input value={"klawiatura telefonu"}></input> */}</div>
+        <KeyboardGrid wordsHodler={['qwertyuiop', 'asdfghjkl', 'zxcvbnm']} clickHandler={detectKeyDown}></KeyboardGrid>
         {/* <WordleGrid
           maxNumbersOfLetters={0}
           maxNumbersOfRows={maxNumbersOfRows}
