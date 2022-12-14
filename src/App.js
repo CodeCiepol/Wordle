@@ -4,6 +4,7 @@ import InputRow from './components/InputRow'
 import WordleGrid from './components/WordleGrid'
 import dummyWords from './components/dummyWords'
 import KeyboardGrid from './components/KeyboardGrid'
+// import dictionary 
 import Card from './UI/Card'
 
 export default function App() {
@@ -12,15 +13,42 @@ export default function App() {
   const [wordsHodler, setWordsHodler] = useState([])
   const [numberOfAttemps, setNumberOfAttemps] = useState(0)
   const [checkLetterArray, setCheckLetterArray] = useState([])
+  const [error, setError] = useState('no error')
   const [randomWord, setRandomWord] = useState(dummyWords[Math.floor(Math.random() * dummyWords.length)])
   const maxNumbersOfLetters = randomWord.length
 
   const replaceCharString = (string, index, char) => {
     if (index >= string.length) return string
-    console.log(string.substring(0, index) + char + string.substring(index + char.length))
     return string.substring(0, index) + char + string.substring(index + char.length)
   }
 
+  const fetchWordHandler = async () => {
+    try {
+      const response = await fetch('https://wordlegame.org/files/wordle/pl/dictionary.json', {
+        method: 'get',
+        // headers:{
+        //   "Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+        //   "Accept-Encoding": "gzip, deflate, br",
+        //   "Accept-Language":"pl,en-US;q=0.7,en;q=0.3",
+        //   "Connection": "keep-alive",
+        //   "Host": "wordlegame.org",
+        //   "Sec-Fetch-Dest":"document",
+        //   "Sec-Fetch-Mode": "navigate",
+        //   "Sec-Fetch-Site": "cross-site",
+        //   // "Upgrade-Insecure-Requests":"1",
+        //   // "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:107.0) Gecko/20100101 Firefox/107.0"
+        // }
+      })
+      if (!response.ok) {
+        throw new Error("couldn't fetch")
+      }
+      const data = await response.json()
+      console.log("fetch",data)
+    } catch (error) {
+      setError(error.message)
+    }
+  }
+  console.log("ERRORS:",error)
   const findAndReplace = (string, charToFind, CharToReplace) => {
     let stringTemp = string.split('')
     string.split('').every((leter, j) => {
@@ -162,6 +190,7 @@ export default function App() {
         >
           Enter
         </button>
+        <button onClick={fetchWordHandler}>pobierz slowa</button>
         <div>{/* <input value={"klawiatura telefonu"}></input> */}</div>
         <KeyboardGrid wordsHodler={['qwertyuiop', 'asdfghjkl', 'zxcvbnm']} clickHandler={detectKeyDown}></KeyboardGrid>
         {/* <WordleGrid
