@@ -4,16 +4,18 @@ import InputRow from './components/InputRow'
 import WordleGrid from './components/WordleGrid'
 import dummyWords from './components/dummyWords'
 import KeyboardGrid from './components/KeyboardGrid'
+import useFetch from './hooks/useFetch'
 // import dictionary
 import Card from './UI/Card'
 
 export default function App() {
+  const { sendRequest, error } = useFetch()
   const [newWord, setNewWord] = useState('')
   const maxNumbersOfRows = 5
   const [wordsHodler, setWordsHodler] = useState([])
   const [numberOfAttemps, setNumberOfAttemps] = useState(0)
   const [checkLetterArray, setCheckLetterArray] = useState([])
-  const [error, setError] = useState('no error')
+  // const [error, setError] = useState('no error')
   const [randomWord, setRandomWord] = useState(dummyWords[Math.floor(Math.random() * dummyWords.length)])
   const [dictionary, setDictionary] = useState([])
   const [targets, setTargets] = useState([])
@@ -24,25 +26,32 @@ export default function App() {
     if (index >= string.length) return string
     return string.substring(0, index) + char + string.substring(index + char.length)
   }
-
-  const fetchTargetHandler = async () => {
-    try {
-      const response = await fetch(
-        'https://wordle-dafa9-default-rtdb.europe-west1.firebasedatabase.app/targets.json',
-
-        {
-          method: 'get',
-        }
-      )
-      if (!response.ok) {
-        throw new Error("couldn't fetch")
-      }
-      const data = await response.json()
-      setTargets(data['-NJHz-ZGZ0JKFZzBSXwA'])
-    } catch (error) {
-      setError(error.message)
-    }
+  
+const fetchTargetHandler =()=>{
+  const getTargets = (data) => {
+    setTargets(data['-NJHz-ZGZ0JKFZzBSXwA'])
   }
+  sendRequest(getTargets, 'https://wordle-dafa9-default-rtdb.europe-west1.firebasedatabase.app/targets.json')
+}
+
+  // const fetchTargetHandler = async () => {
+  //   try {
+  //     const response = await fetch(
+  //       'https://wordle-dafa9-default-rtdb.europe-west1.firebasedatabase.app/targets.json',
+
+  //       {
+  //         method: 'get',
+  //       }
+  //     )
+  //     if (!response.ok) {
+  //       throw new Error("couldn't fetch")
+  //     }
+  //     const data = await response.json()
+  //     setTargets(data['-NJHz-ZGZ0JKFZzBSXwA'])
+  //   } catch (error) {
+  //     setError(error.message)
+  //   }
+  // }
   const fetchDictionaryHandler = async () => {
     try {
       const response = await fetch(
@@ -61,12 +70,11 @@ export default function App() {
       }
       setDictionary(dataArray)
     } catch (error) {
-      setError(error.message)
+      // setError(error.message)
     }
   }
   console.log('slownik:', dictionary)
   console.log('targets:', targets)
-
 
   const sendWordHandler = async () => {
     console.log('zaczynam wysyłać')
