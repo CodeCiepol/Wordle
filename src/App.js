@@ -5,7 +5,7 @@ import WordleGrid from './components/WordleGrid'
 import dummyWords from './components/dummyWords'
 import KeyboardGrid from './components/KeyboardGrid'
 import useFetch from './hooks/useFetch'
-import {checkLetterHandler2} from './modules/checkLetterHandler'
+import { checkLetterHandler2 } from './modules/checkLetterHandler'
 // import dictionary
 import Card from './UI/Card'
 
@@ -22,16 +22,15 @@ export default function App() {
 
   const maxNumbersOfLetters = randomWord.length
 
-  
   /* fetching dictionaries */
-  const fetchTargetHandler =()=>{
+  const fetchTargetHandler = () => {
     const getTargets = (data) => {
       setTargets(data['-NJHz-ZGZ0JKFZzBSXwA'])
     }
     sendRequest(getTargets, 'https://wordle-dafa9-default-rtdb.europe-west1.firebasedatabase.app/targets.json')
   }
-  
-  const fetchDictionaryHandler =()=>{
+
+  const fetchDictionaryHandler = () => {
     const getTargets = (data) => {
       const dataArray = []
       for (const key in data) {
@@ -41,15 +40,15 @@ export default function App() {
     }
     sendRequest(getTargets, 'https://wordle-dafa9-default-rtdb.europe-west1.firebasedatabase.app/dictionary.json')
   }
-  
+
   console.log('slownik:', dictionary)
   console.log('targets:', targets)
-  
+
   // const replaceCharString = (string, index, char) => {
   //   if (index >= string.length) return string
   //   return string.substring(0, index) + char + string.substring(index + char.length)
   // }
-  
+
   const findAndReplace = (string, charToFind, CharToReplace) => {
     let stringTemp = string.split('')
     string.split('').every((leter, j) => {
