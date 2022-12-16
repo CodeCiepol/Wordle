@@ -5,6 +5,7 @@ import WordleGrid from './components/WordleGrid'
 import dummyWords from './components/dummyWords'
 import KeyboardGrid from './components/KeyboardGrid'
 import useFetch from './hooks/useFetch'
+import checkLetterHandler2 from './modules/checkLetterHandler'
 // import dictionary
 import Card from './UI/Card'
 
@@ -15,102 +16,43 @@ export default function App() {
   const [wordsHodler, setWordsHodler] = useState([])
   const [numberOfAttemps, setNumberOfAttemps] = useState(0)
   const [checkLetterArray, setCheckLetterArray] = useState([])
-  // const [error, setError] = useState('no error')
   const [randomWord, setRandomWord] = useState(dummyWords[Math.floor(Math.random() * dummyWords.length)])
   const [dictionary, setDictionary] = useState([])
   const [targets, setTargets] = useState([])
 
   const maxNumbersOfLetters = randomWord.length
 
-  const replaceCharString = (string, index, char) => {
-    if (index >= string.length) return string
-    return string.substring(0, index) + char + string.substring(index + char.length)
+  
+  /* fetching dictionaries */
+  const fetchTargetHandler =()=>{
+    const getTargets = (data) => {
+      setTargets(data['-NJHz-ZGZ0JKFZzBSXwA'])
+    }
+    sendRequest(getTargets, 'https://wordle-dafa9-default-rtdb.europe-west1.firebasedatabase.app/targets.json')
   }
   
-const fetchTargetHandler =()=>{
-  const getTargets = (data) => {
-    setTargets(data['-NJHz-ZGZ0JKFZzBSXwA'])
-  }
-  sendRequest(getTargets, 'https://wordle-dafa9-default-rtdb.europe-west1.firebasedatabase.app/targets.json')
-}
-
-  // const fetchTargetHandler = async () => {
-  //   try {
-  //     const response = await fetch(
-  //       'https://wordle-dafa9-default-rtdb.europe-west1.firebasedatabase.app/targets.json',
-
-  //       {
-  //         method: 'get',
-  //       }
-  //     )
-  //     if (!response.ok) {
-  //       throw new Error("couldn't fetch")
-  //     }
-  //     const data = await response.json()
-  //     setTargets(data['-NJHz-ZGZ0JKFZzBSXwA'])
-  //   } catch (error) {
-  //     setError(error.message)
-  //   }
-  // }
-  const fetchDictionaryHandler = async () => {
-    try {
-      const response = await fetch(
-        'https://wordle-dafa9-default-rtdb.europe-west1.firebasedatabase.app/dictionary.json',
-        {
-          method: 'get',
-        }
-      )
-      if (!response.ok) {
-        throw new Error("couldn't fetch")
-      }
-      const data = await response.json()
+  const fetchDictionaryHandler =()=>{
+    const getTargets = (data) => {
       const dataArray = []
       for (const key in data) {
         dataArray.push(...data[key])
       }
       setDictionary(dataArray)
-    } catch (error) {
-      // setError(error.message)
     }
+    sendRequest(getTargets, 'https://wordle-dafa9-default-rtdb.europe-west1.firebasedatabase.app/dictionary.json')
   }
+  
   console.log('slownik:', dictionary)
   console.log('targets:', targets)
-
-  const sendWordHandler = async () => {
-    console.log('zaczynam wysyłać')
-    // for (let i = 0; i < dictionary.length; i++) {
-    const response = await fetch('https://wordle-dafa9-default-rtdb.europe-west1.firebasedatabase.app/targets.json', {
-      method: 'POST',
-      body: JSON.stringify(dictionary),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    const data = await response.json()
-    console.log('wysłano:', data)
-
-    // console.log('zaczynam wysyłać')
-    // for (let i = 0; i < dictionary.length / 10000; i++) {
-    //   const response = await fetch(
-    //     'https://wordle-dafa9-default-rtdb.europe-west1.firebasedatabase.app/dictionary.json',
-    //     {
-    //       method: 'POST',
-    //       body: JSON.stringify(dictionary.slice(i * 10000, (i + 1) * 10000)),
-    //       headers: {
-    //         'Content-Type': 'application/json',
-    //       },
-    //     }
-    //   )
-    //   const data = await response.json()
-    // console.log('wysłano:', data)
-    // }
-  }
-
-  // console.log('ERRORS:', error)
+  
+  // const replaceCharString = (string, index, char) => {
+  //   if (index >= string.length) return string
+  //   return string.substring(0, index) + char + string.substring(index + char.length)
+  // }
+  
   const findAndReplace = (string, charToFind, CharToReplace) => {
     let stringTemp = string.split('')
     string.split('').every((leter, j) => {
-      // console.log('index', j, 'includes w findAndReplace', string, charToFind, CharToReplace)
       if (leter === charToFind) {
         stringTemp[j] = CharToReplace
         stringTemp = stringTemp.join('')
@@ -124,7 +66,7 @@ const fetchTargetHandler =()=>{
 
   const stateHandlerBingo = useCallback((letter, i, randomWordTemp) => {
     if (randomWordTemp[i] === letter) {
-      return { state: 'bingo', randomWordTemp: replaceCharString(randomWordTemp, i, '0') }
+      return { state: 'bingo', randomWordTemp: checkLetterHandler2.replaceCharString(randomWordTemp, i, '0') }
     }
     return { state: 'none', randomWordTemp }
   }, [])
@@ -137,24 +79,10 @@ const fetchTargetHandler =()=>{
     return { state: state[i], randomWordTemp }
   }, [])
 
-  // const stateHandler = (letter, i, randomWordTemp) => {
-  //   if (randomWordTemp[i] === letter) {
-  //     // randomWordTemp.slice(i)
-  //     return {state:"bingo",tekst:"dupa"}
-  //   }
-
-  //   if (randomWordTemp.includes(letter)) return {state:"bingo",tekst:"dupa"}
-
-  //   return {state:"bingo",tekst:"dupa"}
-  // }
-
-  // console.log('randomWord', randomWord)
-
   const checkLetterHandler = useCallback(() => {
     const checkLetterTemp = []
     let newWordTemp = newWord.split('')
     let randomWordTemp = randomWord
-    // console.log(randomWordTemp.slice(1))
     let obj = {}
 
     newWordTemp.forEach((letter, i) => {
@@ -184,7 +112,7 @@ const fetchTargetHandler =()=>{
     checkLetterHandler()
     // console.log('checkLetterArray', checkLetterArray)
     setNewWord('')
-    console.log('słowo jest zawarte:', dictionary.includes(newWord))
+    console.log('słowo jest zawarte w słowniku:', dictionary.includes(newWord))
   }, [newWord, checkLetterArray, checkLetterHandler])
 
   const backspaceIsClicked = () => {
@@ -215,17 +143,18 @@ const fetchTargetHandler =()=>{
   const newWordHandler = () => {
     let chosenWord = ''
     for (let i = 0; i < 100; i++) {
-      chosenWord = dictionary[Math.floor(Math.random() * dictionary.length)]
+      console.log(targets)
+      chosenWord = targets[Math.floor(Math.random() * targets.length)]
       if (chosenWord.length === 5) {
         console.log(chosenWord)
         console.log('znaleziono')
         setNewWord(chosenWord)
-        // break
+        break
       }
       // else console.log("nie znaleziono")
     }
     // dictionary[Math.floor(Math.random() * dummyWords.length)]
-    setRandomWord(dummyWords[Math.floor(Math.random() * dummyWords.length)])
+    // setRandomWord(dummyWords[Math.floor(Math.random() * dummyWords.length)])
     setWordsHodler([])
     setCheckLetterArray([])
     setNumberOfAttemps(0)
