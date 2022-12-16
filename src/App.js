@@ -5,7 +5,7 @@ import WordleGrid from './components/WordleGrid'
 import dummyWords from './components/dummyWords'
 import KeyboardGrid from './components/KeyboardGrid'
 import useFetch from './hooks/useFetch'
-import checkLetterHandler2 from './modules/checkLetterHandler'
+import {checkLetterHandler2} from './modules/checkLetterHandler'
 // import dictionary
 import Card from './UI/Card'
 
@@ -66,7 +66,7 @@ export default function App() {
 
   const stateHandlerBingo = useCallback((letter, i, randomWordTemp) => {
     if (randomWordTemp[i] === letter) {
-      return { state: 'bingo', randomWordTemp: checkLetterHandler2.replaceCharString(randomWordTemp, i, '0') }
+      return { state: 'bingo', randomWordTemp: checkLetterHandler2(randomWordTemp, i, '0') }
     }
     return { state: 'none', randomWordTemp }
   }, [])
