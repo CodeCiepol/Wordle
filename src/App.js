@@ -8,7 +8,7 @@ import useCheckLetterHandler from './hooks/checkLetterHandler'
 import Card from './UI/Card'
 
 export default function App() {
-  const { sendRequest, error } = useFetch()
+  const { sendRequest, error,isLoading} = useFetch()
   const { newWord, setNewWord, checkLetterArray, setCheckLetterArray, randomWord, setRandomWord, checkLetterHandler } =
     useCheckLetterHandler()
 
@@ -27,7 +27,7 @@ export default function App() {
       console.log('Targets downloaded:', data['-NJHz-ZGZ0JKFZzBSXwA'])
     }
     sendRequest(getTargets, 'https://wordle-dafa9-default-rtdb.europe-west1.firebasedatabase.app/targets.json')
-  },[sendRequest])
+  }, [sendRequest])
 
   const fetchDictionaryHandler = useCallback(() => {
     const getTargets = (data) => {
@@ -39,7 +39,7 @@ export default function App() {
       console.log('Dictionary downloaded:', dataArray)
     }
     sendRequest(getTargets, 'https://wordle-dafa9-default-rtdb.europe-west1.firebasedatabase.app/dictionary.json')
-  },[sendRequest])
+  }, [sendRequest])
 
   const enterIsClicked = useCallback(() => {
     setNumberOfAttemps((prev) => prev + 1)
@@ -71,17 +71,13 @@ export default function App() {
   if (error) {
     console.log(error)
   }
-  useEffect(() => {
-    fetchTargetHandler()
-    fetchDictionaryHandler()
-  }, [fetchTargetHandler,fetchDictionaryHandler])
 
   useEffect(() => {
     document.addEventListener('keydown', detectKeyDown)
     return () => document.removeEventListener('keydown', detectKeyDown)
   }, [newWord.length, detectKeyDown])
 
-  const newWordHandler = () => {
+  const newWordHandler = useCallback(() => {
     let chosenWord = ''
     for (let i = 0; i < 100; i++) {
       console.log(targets)
@@ -93,12 +89,17 @@ export default function App() {
         break
       }
     }
-
     setWordsHodler([])
     setCheckLetterArray([])
     setNumberOfAttemps(0)
-  }
+  }, [targets, setCheckLetterArray, setNumberOfAttemps, setRandomWord])
 
+  useEffect(() => {
+    fetchTargetHandler()
+    fetchDictionaryHandler()
+    //  newWordHandler()
+  }, [fetchTargetHandler, fetchDictionaryHandler])
+console.log(isLoading)
   return (
     <div className="App">
       <div className="Game">
