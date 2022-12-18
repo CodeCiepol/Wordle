@@ -29,16 +29,17 @@ export default function App() {
     sendRequest(getTargets, 'https://wordle-dafa9-default-rtdb.europe-west1.firebasedatabase.app/targets.json')
   },[sendRequest])
 
-  const fetchDictionaryHandler = () => {
+  const fetchDictionaryHandler = useCallback(() => {
     const getTargets = (data) => {
       const dataArray = []
       for (const key in data) {
         dataArray.push(...data[key])
       }
       setDictionary(dataArray)
+      console.log('Dictionary downloaded:', dataArray)
     }
     sendRequest(getTargets, 'https://wordle-dafa9-default-rtdb.europe-west1.firebasedatabase.app/dictionary.json')
-  }
+  },[sendRequest])
 
   const enterIsClicked = useCallback(() => {
     setNumberOfAttemps((prev) => prev + 1)
@@ -72,7 +73,8 @@ export default function App() {
   }
   useEffect(() => {
     fetchTargetHandler()
-  }, [fetchTargetHandler])
+    fetchDictionaryHandler()
+  }, [fetchTargetHandler,fetchDictionaryHandler])
 
   useEffect(() => {
     document.addEventListener('keydown', detectKeyDown)
