@@ -2,33 +2,32 @@ import { useState, useEffect, useCallback } from 'react'
 import './App.css'
 import InputRow from './components/InputRow'
 import WordleGrid from './components/WordleGrid'
-import dummyWords from './components/dummyWords'
 import KeyboardGrid from './components/KeyboardGrid'
 import useFetch from './hooks/useFetch'
-import { replaceCharString, findAndReplace } from './modules/checkLetterHandler'
-// import dictionary
+import useCheckLetterHandler from './hooks/checkLetterHandler'
 import Card from './UI/Card'
 
 export default function App() {
   const { sendRequest, error } = useFetch()
-  const [newWord, setNewWord] = useState('')
-  const maxNumbersOfRows = 5
+  const { newWord, setNewWord, checkLetterArray, setCheckLetterArray, randomWord, setRandomWord, checkLetterHandler } =
+    useCheckLetterHandler()
+
   const [wordsHodler, setWordsHodler] = useState([])
+  const maxNumbersOfRows = 5
   const [numberOfAttemps, setNumberOfAttemps] = useState(0)
-  const [checkLetterArray, setCheckLetterArray] = useState([])
-  const [randomWord, setRandomWord] = useState(dummyWords[Math.floor(Math.random() * dummyWords.length)])
   const [dictionary, setDictionary] = useState([])
   const [targets, setTargets] = useState([])
 
   const maxNumbersOfLetters = randomWord.length
 
   /* fetching dictionaries */
-  const fetchTargetHandler = () => {
+  const fetchTargetHandler = useCallback(() => {
     const getTargets = (data) => {
       setTargets(data['-NJHz-ZGZ0JKFZzBSXwA'])
+      console.log('Targets downloaded:', data['-NJHz-ZGZ0JKFZzBSXwA'])
     }
     sendRequest(getTargets, 'https://wordle-dafa9-default-rtdb.europe-west1.firebasedatabase.app/targets.json')
-  }
+  },[sendRequest])
 
   const fetchDictionaryHandler = () => {
     const getTargets = (data) => {
@@ -41,82 +40,17 @@ export default function App() {
     sendRequest(getTargets, 'https://wordle-dafa9-default-rtdb.europe-west1.firebasedatabase.app/dictionary.json')
   }
 
-  console.log('slownik:', dictionary)
-  console.log('targets:', targets)
-
-  // const replaceCharString = (string, index, char) => {
-  //   if (index >= string.length) return string
-  //   return string.substring(0, index) + char + string.substring(index + char.length)
-  // }
-
-  // const findAndReplace = (string, charToFind, CharToReplace) => {
-  //   let stringTemp = string.split('')
-  //   string.split('').every((leter, j) => {
-  //     if (leter === charToFind) {
-  //       stringTemp[j] = CharToReplace
-  //       stringTemp = stringTemp.join('')
-  //       // console.log('znaleziono i podmieniono na:', stringTemp)
-  //       return false
-  //     }
-  //     return true
-  //   })
-  //   return stringTemp
-  // }
-
-  const stateHandlerBingo = useCallback((letter, i, randomWordTemp) => {
-    if (randomWordTemp[i] === letter) {
-      return { state: 'bingo', randomWordTemp: replaceCharString(randomWordTemp, i, '0') }
-    }
-    return { state: 'none', randomWordTemp }
-  }, [])
-
-  const stateHandlerInclude = useCallback((state, letter, i, randomWordTemp) => {
-    if (randomWordTemp.includes(letter)) {
-      // console.log('litera', letter, 'includes w stateHandlerze')
-      return { state: 'include', randomWordTemp: findAndReplace(randomWordTemp, letter, '0') }
-    }
-    return { state: state[i], randomWordTemp }
-  }, [])
-
-  const checkLetterHandler = useCallback(() => {
-    const checkLetterTemp = []
-    let newWordTemp = newWord.split('')
-    let randomWordTemp = randomWord
-    let obj = {}
-
-    newWordTemp.forEach((letter, i) => {
-      obj = stateHandlerBingo(letter, i, randomWordTemp)
-      randomWordTemp = obj.randomWordTemp
-      checkLetterTemp[i] = obj.state
-    })
-    // console.log('BINGO randomWordTemp:', randomWordTemp, 'checkLetterTemp', checkLetterTemp)
-
-    newWordTemp.forEach((letter, i) => {
-      obj = stateHandlerInclude(checkLetterTemp, letter, i, randomWordTemp)
-      // console.log('objINCLUDE', obj)
-      randomWordTemp = obj.randomWordTemp
-      checkLetterTemp[i] = obj.state
-    })
-    // console.log('INCLUDE randomWordTemp:', randomWordTemp, 'checkLetterTemp', checkLetterTemp)
-
-    let checkLetterArrayTemp = checkLetterArray
-    checkLetterArrayTemp.push(checkLetterTemp)
-    // console.log('checckLetterArrayTemp', checkLetterArrayTemp)
-    setCheckLetterArray(checkLetterArrayTemp)
-  }, [newWord, stateHandlerInclude, stateHandlerBingo, randomWord, checkLetterArray])
-
   const enterIsClicked = useCallback(() => {
     setNumberOfAttemps((prev) => prev + 1)
     setWordsHodler((prev) => [...prev, newWord])
     checkLetterHandler()
-    // console.log('checkLetterArray', checkLetterArray)
     setNewWord('')
     console.log('słowo jest zawarte w słowniku:', dictionary.includes(newWord))
-  }, [newWord, checkLetterArray, checkLetterHandler])
+  }, [newWord, setNewWord, checkLetterHandler, dictionary])
 
-  const backspaceIsClicked = () => {
+  const backspaceIsClicked = useCallback(() => {
     setNewWord((prevWord) => prevWord.slice(0, -1))
-  }
+  }, [setNewWord])
 
   const enterIsAvaible = useCallback(() => {
     return newWord.length === maxNumbersOfLetters && numberOfAttemps < maxNumbersOfRows
@@ -131,8 +65,14 @@ export default function App() {
       if (newWord.length > maxNumbersOfLetters - 1) return
       setNewWord((prevWord) => prevWord + event.key.toLowerCase())
     },
-    [newWord, enterIsClicked, maxNumbersOfLetters, enterIsAvaible]
+    [newWord, setNewWord, backspaceIsClicked, enterIsClicked, maxNumbersOfLetters, enterIsAvaible]
   )
+  if (error) {
+    console.log(error)
+  }
+  useEffect(() => {
+    fetchTargetHandler()
+  }, [fetchTargetHandler])
 
   useEffect(() => {
     document.addEventListener('keydown', detectKeyDown)
@@ -146,14 +86,12 @@ export default function App() {
       chosenWord = targets[Math.floor(Math.random() * targets.length)]
       if (chosenWord.length === 5) {
         console.log(chosenWord)
-        console.log('znaleziono')
-        setNewWord(chosenWord)
+        console.log('new word', chosenWord)
+        setRandomWord(chosenWord)
         break
       }
-      // else console.log("nie znaleziono")
     }
-    // dictionary[Math.floor(Math.random() * dummyWords.length)]
-    // setRandomWord(dummyWords[Math.floor(Math.random() * dummyWords.length)])
+
     setWordsHodler([])
     setCheckLetterArray([])
     setNumberOfAttemps(0)
@@ -191,13 +129,10 @@ export default function App() {
         </button>
         <button onClick={fetchTargetHandler}>pobierz cele</button>
         <button onClick={fetchDictionaryHandler}>pobierz slownik</button>
-        <div>{/* <input value={"klawiatura telefonu"}></input> */}</div>
-        <KeyboardGrid wordsHodler={['qwertyuiop', 'asdfghjkl', 'zxcvbnm']} clickHandler={detectKeyDown}></KeyboardGrid>
-        {/* <WordleGrid
-          maxNumbersOfLetters={0}
-          maxNumbersOfRows={maxNumbersOfRows}
-          wordsHodler={['qwertyuiop','asdfghjkl','zxcvbnm']}
-        /> */}
+        <KeyboardGrid
+          wordsHodler={['qwertyuiop', 'asdfghjkl', 'zxcvbnm', 'ąęćśłóżź']}
+          clickHandler={detectKeyDown}
+        ></KeyboardGrid>
       </div>
     </div>
   )

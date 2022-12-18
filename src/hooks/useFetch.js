@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useState,useCallback} from 'react'
 
 const useFetch = () => {
   const [error, setError] = useState(null)
 
-  const sendRequest = async (applyData, url) => {
+  const sendRequest = useCallback(async (applyData, url) => {
     setError(null)
     try {
       const response = await fetch(url, {
@@ -17,7 +17,7 @@ const useFetch = () => {
     } catch (error) {
       setError(error.message || 'something went wrong')
     }
-  }
+  },[])
   return { sendRequest, error }
 }
 
