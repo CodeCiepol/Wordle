@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import './App.css'
 import InputRow from './components/InputRow'
 import WordleGrid from './components/WordleGrid'
@@ -8,7 +8,7 @@ import useCheckLetterHandler from './hooks/checkLetterHandler'
 import Card from './UI/Card'
 
 export default function App() {
-  const { sendRequest, error,isLoading} = useFetch()
+  const { sendRequest, error, isLoading } = useFetch()
   const { newWord, setNewWord, checkLetterArray, setCheckLetterArray, randomWord, setRandomWord, checkLetterHandler } =
     useCheckLetterHandler()
 
@@ -79,8 +79,8 @@ export default function App() {
 
   const newWordHandler = useCallback(() => {
     let chosenWord = ''
+    console.log(targets)
     for (let i = 0; i < 100; i++) {
-      console.log(targets)
       chosenWord = targets[Math.floor(Math.random() * targets.length)]
       if (chosenWord.length === 5) {
         console.log(chosenWord)
@@ -95,11 +95,21 @@ export default function App() {
   }, [targets, setCheckLetterArray, setNumberOfAttemps, setRandomWord])
 
   useEffect(() => {
-    fetchTargetHandler()
     fetchDictionaryHandler()
-    //  newWordHandler()
-  }, [fetchTargetHandler, fetchDictionaryHandler])
-console.log(isLoading)
+    fetchTargetHandler()
+  }, [fetchDictionaryHandler,fetchTargetHandler])
+
+  const isFirstRender = useRef(true)
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
+    newWordHandler()
+    console.log('wykonano!')
+  }, [newWordHandler, targets])
+
+  console.log("loading?",isLoading)
   return (
     <div className="App">
       <div className="Game">
