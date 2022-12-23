@@ -8,7 +8,7 @@ import useCheckLetterHandler from './hooks/checkLetterHandler'
 import Card from './UI/Card'
 
 export default function App() {
-  const { sendRequest, error, isLoading } = useFetch()
+  const { sendRequest, error } = useFetch()
   const { newWord, setNewWord, checkLetterArray, setCheckLetterArray, randomWord, setRandomWord, checkLetterHandler } =
     useCheckLetterHandler()
 
@@ -24,7 +24,7 @@ export default function App() {
   const fetchTargetHandler = useCallback(() => {
     const getTargets = (data) => {
       setTargets(data['-NJHz-ZGZ0JKFZzBSXwA'])
-      console.log('Targets downloaded:', data['-NJHz-ZGZ0JKFZzBSXwA'])
+      console.log('Targets downloaded:')
     }
     sendRequest(getTargets, 'https://wordle-dafa9-default-rtdb.europe-west1.firebasedatabase.app/targets.json')
   }, [sendRequest])
@@ -36,7 +36,7 @@ export default function App() {
         dataArray.push(...data[key])
       }
       setDictionary(dataArray)
-      console.log('Dictionary downloaded:', dataArray)
+      console.log('Dictionary downloaded')
     }
     sendRequest(getTargets, 'https://wordle-dafa9-default-rtdb.europe-west1.firebasedatabase.app/dictionary.json')
   }, [sendRequest])
@@ -46,8 +46,8 @@ export default function App() {
     setWordsHodler((prev) => [...prev, newWord])
     checkLetterHandler()
     setNewWord('')
-    console.log('słowo jest zawarte w słowniku:', dictionary.includes(newWord))
-  }, [newWord, setNewWord, checkLetterHandler, dictionary])
+    // console.log('słowo jest zawarte w słowniku')
+  }, [newWord, setNewWord, checkLetterHandler])
 
   const backspaceIsClicked = useCallback(() => {
     setNewWord((prevWord) => prevWord.slice(0, -1))
@@ -69,7 +69,7 @@ export default function App() {
     [newWord, setNewWord, backspaceIsClicked, enterIsClicked, maxNumbersOfLetters, enterIsAvaible]
   )
   if (error) {
-    console.log(error)
+    console.log('error!', error)
   }
 
   useEffect(() => {
@@ -79,12 +79,10 @@ export default function App() {
 
   const newWordHandler = useCallback(() => {
     let chosenWord = ''
-    console.log(targets)
+    // console.log(targets)
     for (let i = 0; i < 100; i++) {
       chosenWord = targets[Math.floor(Math.random() * targets.length)]
       if (chosenWord.length === 5) {
-        console.log(chosenWord)
-        console.log('new word', chosenWord)
         setRandomWord(chosenWord)
         break
       }
@@ -97,7 +95,7 @@ export default function App() {
   useEffect(() => {
     fetchDictionaryHandler()
     fetchTargetHandler()
-  }, [fetchDictionaryHandler,fetchTargetHandler])
+  }, [fetchDictionaryHandler, fetchTargetHandler])
 
   const isFirstRender = useRef(true)
   useEffect(() => {
@@ -106,10 +104,10 @@ export default function App() {
       return
     }
     newWordHandler()
-    console.log('wykonano!')
+    // console.log('wykonano!')
   }, [newWordHandler, targets])
 
-  console.log("loading?",isLoading)
+  // console.log('loading?', isLoading)
   return (
     <div className="App">
       <div className="Game">
@@ -120,6 +118,7 @@ export default function App() {
           checkLetterArray={checkLetterArray}
         />
         <InputRow letters={newWord} maxNumbersOfLetters={maxNumbersOfLetters}></InputRow>
+        <div style={{ color: 'white', backgroundColor: 'red', borderRadius: 10 }}>słowa nie ma w slowniku!</div>
         <Card className="whiteBackground">
           zgadnij jakie to słowo, masz na to {maxNumbersOfRows - numberOfAttemps} prób!
         </Card>

@@ -1,12 +1,10 @@
-import { useCallback,useState } from "react"
+import { useCallback, useState } from 'react'
 import dummyWords from '../components/dummyWords'
 
-
-const useCheckLetterHandler =()=>{
+const useCheckLetterHandler = () => {
   const [newWord, setNewWord] = useState('')
   const [randomWord, setRandomWord] = useState(dummyWords[Math.floor(Math.random() * dummyWords.length)])
   const [checkLetterArray, setCheckLetterArray] = useState([])
-
 
   const replaceCharString = (string, index, char) => {
     if (index >= string.length) return string
@@ -27,11 +25,15 @@ const useCheckLetterHandler =()=>{
     return stringTemp
   }
 
-  const stateHandlerBingo = useCallback((letter, i, randomWordTemp) => {
+  const stateHandlerBingo = useCallback((letter, i, randomWordTemp,newWordTemp) => {
     if (randomWordTemp[i] === letter) {
-      return { state: 'bingo', randomWordTemp: replaceCharString(randomWordTemp, i, '0') }
+      return {
+        state: 'bingo',
+        randomWordTemp: replaceCharString(randomWordTemp, i, '0'),
+        newLetterTemp: "1",
+      }
     }
-    return { state: 'none', randomWordTemp }
+    return { state: 'none', randomWordTemp, newLetterTemp:letter}
   }, [])
 
   const stateHandlerInclude = useCallback((state, letter, i, randomWordTemp) => {
@@ -50,16 +52,20 @@ const useCheckLetterHandler =()=>{
 
     newWordTemp.forEach((letter, i) => {
       obj = stateHandlerBingo(letter, i, randomWordTemp)
+      // {state,randomWordTemp}=obj
       randomWordTemp = obj.randomWordTemp
       checkLetterTemp[i] = obj.state
+      newWordTemp[i] = obj.newLetterTemp
+      console.log('stateHandlerBingo:', randomWordTemp)
     })
     // console.log('BINGO randomWordTemp:', randomWordTemp, 'checkLetterTemp', checkLetterTemp)
-
+    console.log('przedInclude:', randomWordTemp)
     newWordTemp.forEach((letter, i) => {
       obj = stateHandlerInclude(checkLetterTemp, letter, i, randomWordTemp)
       // console.log('objINCLUDE', obj)
       randomWordTemp = obj.randomWordTemp
       checkLetterTemp[i] = obj.state
+      console.log('stateHandlerInclude:', randomWordTemp)
     })
     // console.log('INCLUDE randomWordTemp:', randomWordTemp, 'checkLetterTemp', checkLetterTemp)
 
@@ -68,6 +74,6 @@ const useCheckLetterHandler =()=>{
     // console.log('checckLetterArrayTemp', checkLetterArrayTemp)
     setCheckLetterArray(checkLetterArrayTemp)
   }, [newWord, stateHandlerInclude, stateHandlerBingo, randomWord, checkLetterArray])
-return {newWord, setNewWord,checkLetterArray, setCheckLetterArray,randomWord, setRandomWord,checkLetterHandler}
+  return { newWord, setNewWord, checkLetterArray, setCheckLetterArray, randomWord, setRandomWord, checkLetterHandler }
 }
 export default useCheckLetterHandler

@@ -1,6 +1,6 @@
 const dummyWords = [
   // 'test',
-  'siema',
+  'nylon',
   // 'spalony',
   // 'alkohol',
   // 'nigdy',
