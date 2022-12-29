@@ -21,10 +21,10 @@ export default function App() {
   const maxNumbersOfLetters = randomWord.length
 
   /* fetching dictionaries */
-  const fetchTargetHandler = useCallback(() => {
+  const fetchTargetsHandler = useCallback(() => {
     const getTargets = (data) => {
       setTargets(data['-NJHz-ZGZ0JKFZzBSXwA'])
-      console.log('Targets downloaded:')
+      console.log('Targets downloaded')
     }
     sendRequest(getTargets, 'https://wordle-dafa9-default-rtdb.europe-west1.firebasedatabase.app/targets.json')
   }, [sendRequest])
@@ -94,8 +94,8 @@ export default function App() {
 
   useEffect(() => {
     fetchDictionaryHandler()
-    fetchTargetHandler()
-  }, [fetchDictionaryHandler, fetchTargetHandler])
+    fetchTargetsHandler()
+  }, [fetchDictionaryHandler, fetchTargetsHandler])
 
   const isFirstRender = useRef(true)
   useEffect(() => {
@@ -118,29 +118,11 @@ export default function App() {
           checkLetterArray={checkLetterArray}
         />
         <InputRow letters={newWord} maxNumbersOfLetters={maxNumbersOfLetters}></InputRow>
-        <div style={{ color: 'white', backgroundColor: 'red', borderRadius: 10 }}>słowa nie ma w slowniku!</div>
+        <div style={{ color: 'white', backgroundColor: 'red', borderRadius: 10 }}>słowa nie ma w słowniku!</div>
         <Card className="whiteBackground">
           zgadnij jakie to słowo, masz na to {maxNumbersOfRows - numberOfAttemps} prób!
         </Card>
         <button onClick={newWordHandler}>Nowe słowo</button>
-        <button
-          style={{ marginLeft: 10, marginTop: 10 }}
-          onClick={() => {
-            detectKeyDown({ key: 'Backspace', keyCode: '1' })
-          }}
-        >
-          Backspace
-        </button>
-        <button
-          style={{ marginLeft: 10, marginTop: 10 }}
-          onClick={() => {
-            detectKeyDown({ key: 'Enter', keyCode: '1' })
-          }}
-        >
-          Enter
-        </button>
-        <button onClick={fetchTargetHandler}>pobierz cele</button>
-        <button onClick={fetchDictionaryHandler}>pobierz slownik</button>
         <KeyboardGrid
           wordsHodler={['qwertyuiop', 'asdfghjkl', 'zxcvbnm', 'ąęćśłóżź']}
           clickHandler={detectKeyDown}

@@ -6,6 +6,7 @@
 .row {
   display: flex;
   justify-content: center;
+  color: rgb(0, 0, 0);
 }
 
 .square{
@@ -19,9 +20,27 @@
 .square.keyboard{
   position: relative;
   width: 2rem;
-  height: 2rem;
+  height: 2.5rem;
   margin-right: 0.1rem;
   margin-top: 0.1rem;
+  background-color: rgb(139, 138, 138);
+}
+
+.square.additional{
+  position: relative;
+  /* padding: auto; */
+  /* width: 2rem; */
+  height: 2.5rem;
+  margin-right: 0.1rem;
+  margin-top: 0.1rem;
+  background-color: rgb(139, 138, 138);
+}
+.square.additional.backspace{
+  position: relative;
+  padding-inline-end: auto;
+  height: 2.5rem;
+  width: auto;
+  padding: 0px 10px;
   background-color: rgb(139, 138, 138);
 }
 
