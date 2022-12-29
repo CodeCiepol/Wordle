@@ -11,7 +11,7 @@ export default function App() {
   const { sendRequest, error } = useFetch()
   const { newWord, setNewWord, checkLetterArray, setCheckLetterArray, randomWord, setRandomWord, checkLetterHandler } =
     useCheckLetterHandler()
-
+    const [isInclude, setisInclude] = useState(true)
   const [wordsHodler, setWordsHodler] = useState([])
   const maxNumbersOfRows = 5
   const [numberOfAttemps, setNumberOfAttemps] = useState(0)
@@ -41,11 +41,24 @@ export default function App() {
     sendRequest(getTargets, 'https://wordle-dafa9-default-rtdb.europe-west1.firebasedatabase.app/dictionary.json')
   }, [sendRequest])
 
+  const wordIncludeHandler =()=>{
+    if(dictionary.includes(newWord)){
+      console.log("zawarte!")
+      return true
+    }
+    setisInclude(false)
+    return false
+  }
+
   const enterIsClicked = useCallback(() => {
-    setNumberOfAttemps((prev) => prev + 1)
-    setWordsHodler((prev) => [...prev, newWord])
-    checkLetterHandler()
-    setNewWord('')
+    if(wordIncludeHandler()){
+      setNumberOfAttemps((prev) => prev + 1)
+      setWordsHodler((prev) => [...prev, newWord])
+      checkLetterHandler()
+      setNewWord('')
+      return
+    }
+
     // console.log('słowo jest zawarte w słowniku')
   }, [newWord, setNewWord, checkLetterHandler])
 
@@ -59,6 +72,7 @@ export default function App() {
 
   const detectKeyDown = useCallback(
     (event) => {
+      setisInclude(true)
       if (event.key === 'Enter' && enterIsAvaible()) enterIsClicked()
       if (event.key === 'Backspace' && newWord) backspaceIsClicked()
       if (event.key === 'Delete') backspaceIsClicked()
@@ -118,7 +132,10 @@ export default function App() {
           checkLetterArray={checkLetterArray}
         />
         <InputRow letters={newWord} maxNumbersOfLetters={maxNumbersOfLetters}></InputRow>
+        {!isInclude? 
         <div style={{ color: 'white', backgroundColor: 'red', borderRadius: 10 }}>słowa nie ma w słowniku!</div>
+        :<></>
+        }
         <Card className="whiteBackground">
           zgadnij jakie to słowo, masz na to {maxNumbersOfRows - numberOfAttemps} prób!
         </Card>
