@@ -6,12 +6,13 @@ import KeyboardGrid from './components/KeyboardGrid'
 import useFetch from './hooks/useFetch'
 import useCheckLetterHandler from './hooks/checkLetterHandler'
 import Card from './UI/Card'
+import WinnerScreen from './screens/WinnerScreen'
 
 export default function App() {
   const { sendRequest, error } = useFetch()
   const { newWord, setNewWord, checkLetterArray, setCheckLetterArray, randomWord, setRandomWord, checkLetterHandler } =
     useCheckLetterHandler()
-    const [isInclude, setisInclude] = useState(true)
+  const [isInclude, setisInclude] = useState(true)
   const [wordsHodler, setWordsHodler] = useState([])
   const maxNumbersOfRows = 5
   const [numberOfAttemps, setNumberOfAttemps] = useState(0)
@@ -41,17 +42,16 @@ export default function App() {
     sendRequest(getTargets, 'https://wordle-dafa9-default-rtdb.europe-west1.firebasedatabase.app/dictionary.json')
   }, [sendRequest])
 
-  const wordIncludeHandler =()=>{
-    if(dictionary.includes(newWord)){
-      console.log("zawarte!")
+  const wordIncludeHandler = useCallback(() => {
+    if (dictionary.includes(newWord)) {
       return true
     }
     setisInclude(false)
     return false
-  }
+  },[targets,newWord])
 
   const enterIsClicked = useCallback(() => {
-    if(wordIncludeHandler()){
+    if (wordIncludeHandler()) {
       setNumberOfAttemps((prev) => prev + 1)
       setWordsHodler((prev) => [...prev, newWord])
       checkLetterHandler()
@@ -60,7 +60,7 @@ export default function App() {
     }
 
     // console.log('słowo jest zawarte w słowniku')
-  }, [newWord, setNewWord, checkLetterHandler])
+  }, [newWord, setNewWord, checkLetterHandler,wordIncludeHandler])
 
   const backspaceIsClicked = useCallback(() => {
     setNewWord((prevWord) => prevWord.slice(0, -1))
@@ -122,8 +122,12 @@ export default function App() {
   }, [newWordHandler, targets])
 
   // console.log('loading?', isLoading)
+  let winnerScreenApperance=numberOfAttemps===maxNumbersOfRows
+  const [a, b] = useState(true)
+
   return (
     <div className="App">
+      {winnerScreenApperance && (<WinnerScreen newGame={newWordHandler} randomWord={randomWord}/>)}
       <div className="Game">
         <WordleGrid
           maxNumbersOfLetters={maxNumbersOfLetters}
@@ -132,10 +136,11 @@ export default function App() {
           checkLetterArray={checkLetterArray}
         />
         <InputRow letters={newWord} maxNumbersOfLetters={maxNumbersOfLetters}></InputRow>
-        {!isInclude? 
-        <div style={{ color: 'white', backgroundColor: 'red', borderRadius: 10 }}>słowa nie ma w słowniku!</div>
-        :<></>
-        }
+        {!isInclude ? (
+          <div style={{ color: 'white', backgroundColor: 'red', borderRadius: 10 }}>tego słowa nie ma w słowniku!</div>
+        ) : (
+          <></>
+        )}
         <Card className="whiteBackground">
           zgadnij jakie to słowo, masz na to {maxNumbersOfRows - numberOfAttemps} prób!
         </Card>
