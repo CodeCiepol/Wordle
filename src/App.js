@@ -12,12 +12,16 @@ export default function App() {
   const { sendRequest, error } = useFetch()
   const { newWord, setNewWord, checkLetterArray, setCheckLetterArray, randomWord, setRandomWord, checkLetterHandler } =
     useCheckLetterHandler()
-  const [isInclude, setisInclude] = useState(true)
+  const [isWrongWord, setIsWrongWord] = useState(false)
   const [wordsHodler, setWordsHodler] = useState([])
   const maxNumbersOfRows = 5
   const [numberOfAttemps, setNumberOfAttemps] = useState(0)
   const [dictionary, setDictionary] = useState([])
   const [targets, setTargets] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [nrSolved, setNrSolved]= useState(0)
+  const [nrTried, setNrTried]= useState(0)
+  const [winnerScreenApperance, setWinnerScreenApperance] = useState(false)
 
   const maxNumbersOfLetters = randomWord.length
 
@@ -42,13 +46,21 @@ export default function App() {
     sendRequest(getTargets, 'https://wordle-dafa9-default-rtdb.europe-west1.firebasedatabase.app/dictionary.json')
   }, [sendRequest])
 
+  const fetchUsersHandler = useCallback(() => {
+    const getTargets = (data) => {
+      setNrSolved(data["solved"])
+      setNrTried(data["tried"])
+    }
+    sendRequest(getTargets, 'https://wordle-dafa9-default-rtdb.europe-west1.firebasedatabase.app/users.json')
+  }, [sendRequest])
+
   const wordIncludeHandler = useCallback(() => {
     if (dictionary.includes(newWord)) {
       return true
     }
-    setisInclude(false)
+    setIsWrongWord(true)
     return false
-  },[targets,newWord])
+  }, [newWord, dictionary])
 
   const enterIsClicked = useCallback(() => {
     if (wordIncludeHandler()) {
@@ -56,11 +68,16 @@ export default function App() {
       setWordsHodler((prev) => [...prev, newWord])
       checkLetterHandler()
       setNewWord('')
+      if(newWord===randomWord){
+        setWinnerScreenApperance(true)
+      }
       return
     }
+  }, [newWord, setNewWord, checkLetterHandler, wordIncludeHandler])
 
-    // console.log('słowo jest zawarte w słowniku')
-  }, [newWord, setNewWord, checkLetterHandler,wordIncludeHandler])
+  if(numberOfAttemps === maxNumbersOfRows){
+    setWinnerScreenApperance(true)
+  }
 
   const backspaceIsClicked = useCallback(() => {
     setNewWord((prevWord) => prevWord.slice(0, -1))
@@ -72,7 +89,7 @@ export default function App() {
 
   const detectKeyDown = useCallback(
     (event) => {
-      setisInclude(true)
+      setIsWrongWord(false)
       if (event.key === 'Enter' && enterIsAvaible()) enterIsClicked()
       if (event.key === 'Backspace' && newWord) backspaceIsClicked()
       if (event.key === 'Delete') backspaceIsClicked()
@@ -85,7 +102,10 @@ export default function App() {
   if (error) {
     console.log('error!', error)
   }
-
+  function showDataHandler(){
+    console.log(nrSolved)
+    console.log(nrTried)
+  }
   useEffect(() => {
     document.addEventListener('keydown', detectKeyDown)
     return () => document.removeEventListener('keydown', detectKeyDown)
@@ -93,7 +113,6 @@ export default function App() {
 
   const newWordHandler = useCallback(() => {
     let chosenWord = ''
-    // console.log(targets)
     for (let i = 0; i < 100; i++) {
       chosenWord = targets[Math.floor(Math.random() * targets.length)]
       if (chosenWord.length === 5) {
@@ -109,47 +128,52 @@ export default function App() {
   useEffect(() => {
     fetchDictionaryHandler()
     fetchTargetsHandler()
-  }, [fetchDictionaryHandler, fetchTargetsHandler])
-
+    fetchUsersHandler()
+  }, [fetchDictionaryHandler, fetchTargetsHandler,fetchUsersHandler])
+ 
   const isFirstRender = useRef(true)
+
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false
       return
     }
     newWordHandler()
-    // console.log('wykonano!')
+    setIsLoading(false)
   }, [newWordHandler, targets])
-
-  // console.log('loading?', isLoading)
-  let winnerScreenApperance=numberOfAttemps===maxNumbersOfRows
-  const [a, b] = useState(true)
 
   return (
     <div className="App">
-      {winnerScreenApperance && (<WinnerScreen newGame={newWordHandler} randomWord={randomWord}/>)}
-      <div className="Game">
-        <WordleGrid
-          maxNumbersOfLetters={maxNumbersOfLetters}
-          maxNumbersOfRows={maxNumbersOfRows}
-          wordsHodler={wordsHodler}
-          checkLetterArray={checkLetterArray}
-        />
-        <InputRow letters={newWord} maxNumbersOfLetters={maxNumbersOfLetters}></InputRow>
-        {!isInclude ? (
-          <div style={{ color: 'white', backgroundColor: 'red', borderRadius: 10 }}>tego słowa nie ma w słowniku!</div>
-        ) : (
-          <></>
-        )}
-        <Card className="whiteBackground">
-          zgadnij jakie to słowo, masz na to {maxNumbersOfRows - numberOfAttemps} prób!
-        </Card>
-        <button onClick={newWordHandler}>Nowe słowo</button>
-        <KeyboardGrid
-          wordsHodler={['qwertyuiop', 'asdfghjkl', 'zxcvbnm', 'ąęćśłóżź']}
-          clickHandler={detectKeyDown}
-        ></KeyboardGrid>
-      </div>
+      {isLoading ? (
+        <Card className="loadingScreen">ładowanie...</Card>
+      ) : (
+        <div className="Game">
+          {winnerScreenApperance && <WinnerScreen newGame={newWordHandler} randomWord={randomWord} />}
+          <WordleGrid
+            maxNumbersOfLetters={maxNumbersOfLetters}
+            maxNumbersOfRows={maxNumbersOfRows}
+            wordsHodler={wordsHodler}
+            checkLetterArray={checkLetterArray}
+          />
+          <InputRow letters={newWord} maxNumbersOfLetters={maxNumbersOfLetters}></InputRow>
+          {isWrongWord ? (
+            <div style={{ color: 'white', backgroundColor: 'red', borderRadius: 10 }}>
+              tego słowa nie ma w słowniku!
+            </div>
+          ) : (
+            <></>
+          )}
+          <Card className="whiteBackground">
+            zgadnij jakie to słowo, pozostało {maxNumbersOfRows - numberOfAttemps} prób!
+          </Card>
+          <button onClick={newWordHandler}>Nowe słowo</button>
+          <button onClick={showDataHandler}>Poka statystyki</button>
+          <KeyboardGrid
+            wordsHodler={['qwertyuiop', 'asdfghjkl', 'zxcvbnm', 'ąęćśłóżź']}
+            clickHandler={detectKeyDown}
+          ></KeyboardGrid>
+        </div>
+      )}
     </div>
   )
 }
