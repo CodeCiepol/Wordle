@@ -29,7 +29,6 @@ export default function App() {
   const fetchTargetsHandler = useCallback(() => {
     const getTargets = (data) => {
       setTargets(data['-NJHz-ZGZ0JKFZzBSXwA'])
-      console.log('Targets downloaded')
     }
     sendRequest(getTargets, 'https://wordle-dafa9-default-rtdb.europe-west1.firebasedatabase.app/targets.json')
   }, [sendRequest])
@@ -41,7 +40,6 @@ export default function App() {
         dataArray.push(...data[key])
       }
       setDictionary(dataArray)
-      console.log('Dictionary downloaded')
     }
     sendRequest(getTargets, 'https://wordle-dafa9-default-rtdb.europe-west1.firebasedatabase.app/dictionary.json')
   }, [sendRequest])
@@ -113,14 +111,11 @@ export default function App() {
   }, [newWord.length, detectKeyDown])
 
   const find5LettersWord = useCallback(() => {
-    let chosenWord = ''
-    chosenWord = targets[Math.floor(Math.random() * targets.length)]
+    const chosenWord = targets[Math.floor(Math.random() * targets.length)]
     if (chosenWord.length === 5) {
-      console.log("FIND")
       setRandomWord(chosenWord)
       return
     }
-    console.log("SEARCHING")
     return find5LettersWord()
   }, [targets, setRandomWord])
 
