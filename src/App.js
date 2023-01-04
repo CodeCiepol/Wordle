@@ -19,8 +19,8 @@ export default function App() {
   const [dictionary, setDictionary] = useState([])
   const [targets, setTargets] = useState([])
   const [isLoading, setIsLoading] = useState(true)
-  const [nrSolved, setNrSolved]= useState(0)
-  const [nrTried, setNrTried]= useState(0)
+  const [nrSolved, setNrSolved] = useState(0)
+  const [nrTried, setNrTried] = useState(0)
   const [winnerScreenApperance, setWinnerScreenApperance] = useState(false)
 
   const maxNumbersOfLetters = randomWord.length
@@ -48,12 +48,13 @@ export default function App() {
 
   const fetchUsersHandler = useCallback(() => {
     const getTargets = (data) => {
-      setNrSolved(data["solved"])
-      setNrTried(data["tried"])
+      setNrSolved(data['solved'])
+      setNrTried(data['tried'])
     }
     sendRequest(getTargets, 'https://wordle-dafa9-default-rtdb.europe-west1.firebasedatabase.app/users.json')
   }, [sendRequest])
 
+  //popraw tą funkcje zrefaktoruj is in dicitonary
   const wordIncludeHandler = useCallback(() => {
     if (dictionary.includes(newWord)) {
       return true
@@ -68,14 +69,14 @@ export default function App() {
       setWordsHodler((prev) => [...prev, newWord])
       checkLetterHandler()
       setNewWord('')
-      if(newWord===randomWord){
+      if (newWord === randomWord) {
         setWinnerScreenApperance(true)
       }
       return
     }
-  }, [newWord, setNewWord, checkLetterHandler, wordIncludeHandler])
+  }, [newWord, randomWord, setNewWord, checkLetterHandler, wordIncludeHandler])
 
-  if(numberOfAttemps === maxNumbersOfRows){
+  if (numberOfAttemps === maxNumbersOfRows) {
     setWinnerScreenApperance(true)
   }
 
@@ -102,7 +103,7 @@ export default function App() {
   if (error) {
     console.log('error!', error)
   }
-  function showDataHandler(){
+  function showDataHandler() {
     console.log(nrSolved)
     console.log(nrTried)
   }
@@ -111,26 +112,31 @@ export default function App() {
     return () => document.removeEventListener('keydown', detectKeyDown)
   }, [newWord.length, detectKeyDown])
 
-  const newWordHandler = useCallback(() => {
+  const find5LettersWord = useCallback(() => {
     let chosenWord = ''
-    for (let i = 0; i < 100; i++) {
-      chosenWord = targets[Math.floor(Math.random() * targets.length)]
-      if (chosenWord.length === 5) {
-        setRandomWord(chosenWord)
-        break
-      }
+    chosenWord = targets[Math.floor(Math.random() * targets.length)]
+    if (chosenWord.length === 5) {
+      console.log("FIND")
+      setRandomWord(chosenWord)
+      return
     }
+    console.log("SEARCHING")
+    return find5LettersWord()
+  }, [targets, setRandomWord])
+
+  const newWordHandler = useCallback(() => {
+    find5LettersWord()
     setWordsHodler([])
     setCheckLetterArray([])
     setNumberOfAttemps(0)
-  }, [targets, setCheckLetterArray, setNumberOfAttemps, setRandomWord])
+  }, [setCheckLetterArray, setNumberOfAttemps, find5LettersWord])
 
   useEffect(() => {
     fetchDictionaryHandler()
     fetchTargetsHandler()
     fetchUsersHandler()
-  }, [fetchDictionaryHandler, fetchTargetsHandler,fetchUsersHandler])
- 
+  }, [fetchDictionaryHandler, fetchTargetsHandler, fetchUsersHandler])
+
   const isFirstRender = useRef(true)
 
   useEffect(() => {
