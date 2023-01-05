@@ -38,7 +38,6 @@ const useCheckLetterHandler = () => {
 
   const stateHandlerInclude = useCallback((state, letter, i, randomWordTemp) => {
     if (randomWordTemp.includes(letter)) {
-      // console.log('litera', letter, 'includes w stateHandlerze')
       return { state: 'include', randomWordTemp: findAndReplace(randomWordTemp, letter, '0') }
     }
     return { state: state[i], randomWordTemp }
