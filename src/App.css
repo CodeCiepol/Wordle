@@ -6,6 +6,7 @@
 .row {
   display: flex;
   justify-content: center;
+  color: rgb(0, 0, 0);
 }
 
 .square{
@@ -19,9 +20,27 @@
 .square.keyboard{
   position: relative;
   width: 2rem;
-  height: 2rem;
+  height: 2.5rem;
   margin-right: 0.1rem;
   margin-top: 0.1rem;
+  background-color: rgb(139, 138, 138);
+}
+
+.square.additional{
+  position: relative;
+  /* padding: auto; */
+  /* width: 2rem; */
+  height: 2.5rem;
+  margin-right: 0.1rem;
+  margin-top: 0.1rem;
+  background-color: rgb(139, 138, 138);
+}
+.square.additional.backspace{
+  position: relative;
+  padding-inline-end: auto;
+  height: 2.5rem;
+  width: auto;
+  padding: 0px 10px;
   background-color: rgb(139, 138, 138);
 }
 
@@ -50,12 +69,41 @@
 
 .Game{
   position: absolute;
-  bottom:50%;
+  bottom: 5%;
   left:50%;
-  transform: translate(-50%,50%);
+  animation: slide-down 300ms ease-out forwards;
 }
+  @media (min-width: 768px) {
+    .Game{
+      position: absolute;
+      width: 23rem;
+      bottom: 35%;
+      left:50%;
+      animation: slide-down 300ms ease-out forwards;
+    }
+  }
 
 .whiteBackground{
   background-color: white;
   margin-top: 1rem;
+}
+
+.loadingScreen{
+  position: absolute;
+  bottom:50%;
+  left:50%;
+  transform: translate(-50%,50%);
+  padding:1rem;
+  background-color: rgb(139, 138, 138);
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateX(-50%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%);
+  }
 }
