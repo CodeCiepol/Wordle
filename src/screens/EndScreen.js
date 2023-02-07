@@ -1,12 +1,13 @@
-import PopUp from "../UI/PopUp";
-const EndScreen=(props)=>{
-return(
+import PopUp from '../UI/PopUp'
+const EndScreen = (props) => {
+  return (
     <PopUp onClose={props.newGame}>
-        <div>Correct answer is:</div>
-        <div>{props.randomWord}</div>
+      {props.isWin ? <div>Gratulacje!</div> : <div>Może następnym razem!</div>}
+      <div>Poprawne słowo to:</div>
+      <div>{props.randomWord}</div>
 
-        <button onClick={props.newGame}>new game</button>
+      <button onClick={props.newGame}>new game</button>
     </PopUp>
-)
+  )
 }
 export default EndScreen

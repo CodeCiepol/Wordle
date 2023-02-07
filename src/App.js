@@ -22,6 +22,7 @@ export default function App() {
   const [nrSolved, setNrSolved] = useState(0)
   const [nrTried, setNrTried] = useState(0)
   const [endScreenApperance, setEndScreenApperance] = useState(false)
+  const [isWin, setIsWin] = useState(false)
 
   const maxNumbersOfLetters = randomWord.length
 
@@ -69,6 +70,7 @@ export default function App() {
       setNewWord('')
       if (newWord === randomWord) {
         setEndScreenApperance(true)
+        setIsWin(true)
       }
       return
     }
@@ -128,6 +130,7 @@ export default function App() {
     setCheckLetterArray([])
     setNumberOfAttemps(0)
     setEndScreenApperance(false)
+    setIsWin(false)
   }, [setCheckLetterArray, setNumberOfAttemps, find5LettersWord])
 
   useEffect(() => {
@@ -153,7 +156,7 @@ export default function App() {
         <Card className="loadingScreen">ładowanie...</Card>
       ) : (
         <div className="Game">
-          {endScreenApperance && <EndScreen newGame={newWordHandler} randomWord={randomWord} />}
+          {endScreenApperance && <EndScreen newGame={newWordHandler} randomWord={randomWord} isWin={isWin} />}
           <WordleGrid
             maxNumbersOfLetters={maxNumbersOfLetters}
             maxNumbersOfRows={maxNumbersOfRows}
@@ -172,7 +175,7 @@ export default function App() {
             zgadnij jakie to słowo, pozostało {maxNumbersOfRows - numberOfAttemps} prób!
           </Card>
           <button onClick={newWordHandler}>Nowe słowo</button>
-          <button onClick={showDataHandler}>Poka statystyki</button>
+          {/* <button onClick={showDataHandler}>Poka statystyki</button> */}
           <KeyboardGrid
             wordsHodler={['qwertyuiop', 'asdfghjkl', 'zxcvbnm', 'ąęćśłóżź']}
             clickHandler={detectKeyDown}
