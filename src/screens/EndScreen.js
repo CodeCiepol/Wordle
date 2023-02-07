@@ -1,5 +1,5 @@
 import PopUp from "../UI/PopUp";
-const WinnerScreen=(props)=>{
+const EndScreen=(props)=>{
 return(
     <PopUp onClose={props.newGame}>
         <div>Correct answer is:</div>
@@ -9,4 +9,4 @@ return(
     </PopUp>
 )
 }
-export default WinnerScreen
+export default EndScreen

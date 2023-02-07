@@ -6,7 +6,7 @@ import KeyboardGrid from './components/KeyboardGrid'
 import useFetch from './hooks/useFetch'
 import useCheckLetterHandler from './hooks/checkLetterHandler'
 import Card from './UI/Card'
-import WinnerScreen from './screens/WinnerScreen'
+import EndScreen from './screens/EndScreen'
 
 export default function App() {
   const { sendRequest, error } = useFetch()
@@ -21,7 +21,7 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true)
   const [nrSolved, setNrSolved] = useState(0)
   const [nrTried, setNrTried] = useState(0)
-  const [winnerScreenApperance, setWinnerScreenApperance] = useState(false)
+  const [endScreenApperance, setEndScreenApperance] = useState(false)
 
   const maxNumbersOfLetters = randomWord.length
 
@@ -68,15 +68,11 @@ export default function App() {
       checkLetterHandler()
       setNewWord('')
       if (newWord === randomWord) {
-        setWinnerScreenApperance(true)
+        setEndScreenApperance(true)
       }
       return
     }
   }, [newWord, randomWord, setNewWord, checkLetterHandler, wordIncludeHandler])
-
-  if (numberOfAttemps === maxNumbersOfRows) {
-    setWinnerScreenApperance(true)
-  }
 
   const backspaceIsClicked = useCallback(() => {
     setNewWord((prevWord) => prevWord.slice(0, -1))
@@ -105,10 +101,17 @@ export default function App() {
     console.log(nrSolved)
     console.log(nrTried)
   }
+
   useEffect(() => {
     document.addEventListener('keydown', detectKeyDown)
     return () => document.removeEventListener('keydown', detectKeyDown)
   }, [newWord.length, detectKeyDown])
+
+  useEffect(() => {
+    if (numberOfAttemps === maxNumbersOfRows) {
+      setEndScreenApperance(true)
+    }
+  }, [numberOfAttemps])
 
   const find5LettersWord = useCallback(() => {
     const chosenWord = targets[Math.floor(Math.random() * targets.length)]
@@ -124,6 +127,7 @@ export default function App() {
     setWordsHodler([])
     setCheckLetterArray([])
     setNumberOfAttemps(0)
+    setEndScreenApperance(false)
   }, [setCheckLetterArray, setNumberOfAttemps, find5LettersWord])
 
   useEffect(() => {
@@ -149,7 +153,7 @@ export default function App() {
         <Card className="loadingScreen">ładowanie...</Card>
       ) : (
         <div className="Game">
-          {winnerScreenApperance && <WinnerScreen newGame={newWordHandler} randomWord={randomWord} />}
+          {endScreenApperance && <EndScreen newGame={newWordHandler} randomWord={randomWord} />}
           <WordleGrid
             maxNumbersOfLetters={maxNumbersOfLetters}
             maxNumbersOfRows={maxNumbersOfRows}
