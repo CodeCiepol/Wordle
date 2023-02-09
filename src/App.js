@@ -175,7 +175,7 @@ export default function App() {
             zgadnij jakie to słowo, pozostało {maxNumbersOfRows - numberOfAttemps} prób!
           </Card>
           <button onClick={newWordHandler}>Nowe słowo</button>
-          {/* <button onClick={showDataHandler}>Poka statystyki</button> */}
+          <button onClick={showDataHandler}>Pokaż statystyki</button>
           <KeyboardGrid
             wordsHodler={['qwertyuiop', 'asdfghjkl', 'zxcvbnm', 'ąęćśłóżź']}
             clickHandler={detectKeyDown}
